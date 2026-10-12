@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outils de vibe coding : deux sources comparées</title>
+<meta name="description" content="Un post X de 25 ressources face à la liste awesome-vibecoding (43 outils vérifiés et datés). Constats au 12 octobre 2026.">
+<style>
+:root{
+  --bg:#fafbfc;--card:#fff;--soft:#f1f4f8;--fg:#0f172a;--mut:#5b6678;--line:#e2e8f0;
+  --a:#6d4aff;--as:#efeaff;--b:#0891b2;--bs:#e0f5fa;--ok:#15803d;--oks:#e3f6e9;--wa:#a16207;--was:#fdf2d0;--ne:#475569;--nes:#eceff3;
+  --sh:0 1px 2px rgba(15,23,42,.05),0 8px 24px -12px rgba(15,23,42,.12)
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0b1017;--card:#121a24;--soft:#18222f;--fg:#e8edf4;--mut:#9aa7b8;--line:#243142;
+  --a:#a28bff;--as:#241d4a;--b:#3cc4de;--bs:#0d2e38;--ok:#5fd68a;--oks:#0f2d1a;--wa:#f0c24b;--was:#33290c;--ne:#b4bfce;--nes:#1d2735;
+  --sh:none}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:5rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--a);text-underline-offset:3px}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid var(--a);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 1.25rem}
+/* nav */
+nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:.4rem;align-items:center;overflow-x:auto;padding-top:.55rem;padding-bottom:.55rem}
+nav b{margin-right:.75rem;white-space:nowrap}
+nav a{color:var(--mut);text-decoration:none;padding:.3rem .75rem;border-radius:999px;font-size:.9rem;white-space:nowrap}
+nav a:hover,nav a.on{background:var(--soft);color:var(--fg)}
+/* hero */
+header{padding:3.5rem 0 2rem;background:
+  radial-gradient(60rem 22rem at 85% -10%,color-mix(in srgb,var(--a) 14%,transparent),transparent 70%),
+  radial-gradient(50rem 20rem at 0% 0%,color-mix(in srgb,var(--b) 12%,transparent),transparent 70%)}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.1;margin:.9rem 0 .8rem;letter-spacing:-.03em;max-width:18ch}
+.lead{font-size:1.15rem;color:var(--mut);max-width:60ch;margin:0}
+.date{display:inline-flex;gap:.4rem;align-items:center;background:var(--card);border:1px solid var(--line);padding:.25rem .75rem;border-radius:999px;font-size:.85rem;color:var(--mut)}
+.date::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--ok)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.25rem;box-shadow:var(--sh);border-top:4px solid var(--c)}
+.stat.a{--c:var(--a)}.stat.b{--c:var(--b)}.stat.z{--c:var(--ne)}
+.stat strong{display:block;font-size:2.4rem;line-height:1;letter-spacing:-.03em;color:var(--c)}
+.stat span{display:block;margin-top:.4rem;font-size:.92rem;color:var(--mut)}
+/* sections */
+section{padding-top:3rem}
+h2{font-size:1.65rem;letter-spacing:-.02em;margin:0 0 .4rem}
+h3{font-size:1.1rem;margin:0}
+p{max-width:70ch}
+.hint{color:var(--mut);font-size:.9rem;margin:.25rem 0 1rem}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.25rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem;box-shadow:var(--sh)}
+.card.a{border-top:4px solid var(--a)}.card.b{border-top:4px solid var(--b)}
+.card h3{margin-bottom:.6rem}
+.card dl{margin:0;display:grid;grid-template-columns:7.5rem 1fr;gap:.55rem .75rem;font-size:.93rem}
+.card dt{color:var(--mut)}.card dd{margin:0}
+.take{margin-top:1rem;background:linear-gradient(90deg,var(--as),var(--bs));border-radius:14px;padding:1rem 1.25rem}
+.take p{margin:0;max-width:none}
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--sh)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:.65rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--soft)}
+th{background:var(--soft);font-weight:600;font-size:.82rem;color:var(--mut);white-space:nowrap}
+.n,.d{white-space:nowrap;color:var(--mut)}
+.u{font-size:.82rem;word-break:break-all}
+.name{font-weight:600}
+/* badges */
+.pill{display:inline-block;border-radius:999px;padding:.05rem .65rem;font-size:.78rem;font-weight:600;white-space:nowrap;background:var(--nes);color:var(--ne)}
+.c-prompts{background:var(--as);color:var(--a)}
+.c-inspiration{background:var(--was);color:var(--wa)}
+.c-design{background:var(--oks);color:var(--ok)}
+.c-ui{background:var(--bs);color:var(--b)}
+.c-anim{background:#fde4ee;color:#be185d}
+@media (prefers-color-scheme:dark){.c-anim{background:#3a1526;color:#f58bb5}}
+.k-ok{background:var(--oks);color:var(--ok)}.k-wa{background:var(--was);color:var(--wa)}.k-ne{background:var(--nes);color:var(--ne)}
+.acc{display:block;margin-top:.3rem;color:var(--mut);font-size:.85rem}
+/* filters */
+.bar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:1rem 0}
+input[type=search]{flex:1 1 16rem;max-width:26rem;padding:.6rem .9rem;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font:inherit}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:.3rem .85rem;font:inherit;font-size:.88rem;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.grp{margin-top:1.75rem}
+.grp header{padding:0;background:none;display:flex;align-items:baseline;gap:.6rem;margin-bottom:.6rem}
+.grp .cnt{color:var(--mut);font-size:.88rem}
+details{margin:1rem 0}summary{cursor:pointer;color:var(--a);font-weight:600}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:14px;margin-top:.75rem}
+.empty{padding:1rem;color:var(--mut)}
+footer{margin:3.5rem 0 2rem;padding-top:1.25rem;border-top:1px solid var(--line);color:var(--mut);font-size:.88rem}
+@media(max-width:720px){.stats{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.card dl{grid-template-columns:1fr}.card dt{margin-top:.4rem}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><b>Vibe coding</b><a href="#compare">Comparaison</a><a href="#a">Source A</a><a href="#b">Source B</a><a href="#sources">Sources</a></div></nav>
+
+<header><div class="wrap">
+  <span class="date">Constats au 12 octobre 2026</span>
+  <h1>Deux listes d'outils de vibe coding, comparées</h1>
+  <p class="lead">Un post X et une liste « awesome » vérifiée ne répondent pas à la même question. Voici ce que chacune contient, et ce qui les distingue.</p>
+  <div class="stats">
+    <div class="stat a"><strong>25</strong><span>ressources dans le post X (source A)</span></div>
+    <div class="stat b"><strong>43</strong><span>outils vérifiés dans awesome-vibecoding (source B)</span></div>
+    <div class="stat z"><strong>0</strong><span>outil présent dans les deux listes</span></div>
+  </div>
+</div></header>
+
+<main class="wrap">
+<section id="compare">
+  <h2>Comparaison</h2>
+  <div class="cards">
+    <div class="card a"><h3>Source A · Post X</h3>
+      <dl>
+        <dt>Nature</dt><dd>Liste personnelle, Himanshu Hingorani, 9 oct. 2026</dd>
+        <dt>Contenu</dt><dd>Interface et design : 10 composants UI, 7 animations, 4 inspirations, 2 design systems, 2 prompts</dd>
+        <dt>Vérification</dt><dd>Aucune date ni preuve affichée</dd>
+        <dt>Attention</dt><dd>L'auteur est fondateur de scrolltide.co, la ressource n°1 de la liste</dd>
+      </dl></div>
+    <div class="card b"><h3>Source B · awesome-vibecoding</h3>
+      <dl>
+        <dt>Nature</dt><dd>Liste « awesome » GitHub (fork de roboco-io), critères d'admission publiés</dd>
+        <dt>Contenu</dt><dd>Travail avec des agents : code (10), app & UI (6), contexte (8), test (7), déploiement (4), espaces de travail (8)</dd>
+        <dt>Vérification</dt><dd>Date par entrée, du 18 sept. au 4 oct. 2026 ; « Check pricing » = prix non examiné</dd>
+        <dt>Attention</dt><dd>Mises à jour hebdomadaires assistées par des agents IA, selon le README ; version française <code>README.fr.md</code> non relue ici</dd>
+      </dl></div>
+  </div>
+  <div class="take"><p><strong>À retenir.</strong> A aide à choisir l'apparence et les composants ; B aide à choisir l'agent et la chaîne de travail (contexte, test, déploiement). Les deux se complètent plus qu'elles ne se recoupent.</p></div>
+</section>
+
+<section id="a">
+  <h2>Source A : les 25 ressources du post</h2>
+  <p class="hint">Les URL marquées (?) sont écrites en petit sur la capture : à vérifier avant usage. Les catégories sont mon interprétation.</p>
+  <div class="bar"><input type="search" id="f" placeholder="Filtrer les deux tableaux" aria-label="Filtrer les deux tableaux"><span id="chips"></span></div>
+  <div class="tw"><table><thead><tr><th>n°</th><th>Nom</th><th>URL</th><th>Description</th><th>Catégorie</th></tr></thead><tbody id="ta"></tbody></table></div>
+  <details><summary>Voir la capture d'origine</summary><img src="docs/Vibe-coding/Vibe-coding.png" alt="Capture du post X de Himanshu Hingorani du 9 octobre 2026" loading="lazy"></details>
+</section>
+
+<section id="b">
+  <h2>Source B : les outils par tâche</h2>
+  <p class="hint">« Access / scope » vient du README. La date indique quand l'offre a été vérifiée, pas sa date de sortie ; ce n'est ni un audit de sécurité ni une promesse de disponibilité.</p>
+  <div id="tb"></div>
+</section>
+
+<section id="sources">
+  <h2>Sources</h2>
+  <p>Capture du post X (<code>docs/Vibe-coding/Vibe-coding.png</code>) et <a href="https://github.com/Scap-Mehdi/awesome-vibecoding">github.com/Scap-Mehdi/awesome-vibecoding</a>, README anglais relu le 12 oct. 2026 (dernière vérification listée : 4 oct. 2026). Descriptions reformulées en français. Ces informations évoluent : revérifie le README avant de t'en servir.</p>
+</section>
+<footer>Page générée le 12 octobre 2026.</footer>
+</main>
+<noscript><p class="wrap">Les tableaux nécessitent JavaScript.</p></noscript>
+
+<script>
+var A=[
+["Scrolltide","scrolltide.co","600+ prompts pour sites 3D et pilotés par le scroll, avec code source","prompts"],
+["Minimal Gallery","minimal.gallery","Sites haut de gamme à donner en référence à un agent","inspiration"],
+["Godly","godly.website","Sites choisis à la main, design sérieux","inspiration"],
+["Refero Styles","styles.refero.design","2 000+ styles de produits réels avec typographie","design system"],
+["Component Gallery","component.gallery","2 600+ exemples d'un même composant selon les design systems","composants UI"],
+["Mobbin","mobbin.com","Parcours d'applications réelles","inspiration"],
+["DESIGNmd (?)","designmd.ai","Design systems en Markdown lisibles par un agent","design system"],
+["VibePrompt","vibeprompts.dev","Prompts pour tableaux de bord et landing pages","prompts"],
+["21st.dev","21st.dev","Registre de composants branché aux agents via MCP","composants UI"],
+["Kinetics (?)","kinetics.colorion.co","150+ effets de mouvement, code React et prompts","animation"],
+["shadcn/ui","ui.shadcn.com","Référence pour une UI propre et réutilisable","composants UI"],
+["Aceternity UI","ui.aceternity.com","200+ composants React/Tailwind animés","composants UI"],
+["Magic UI","magicui.design","Composants pour applications web modernes","composants UI"],
+["Motion Primitives","motion-primitives.com","Composants d'animation et d'interaction","animation"],
+["Uiverse","uiverse.io","Éléments d'interface créés par la communauté","composants UI"],
+["Shadcnblocks","shadcnblocks.com","Blocs complets, pas seulement des boutons","composants UI"],
+["mapcn","mapcn.dev","Cartes : marqueurs, itinéraires, popups","composants UI"],
+["Awwwards","awwwards.com","Sites réellement primés","inspiration"],
+["Liquid Glass (?)","glass.samasante.com","Composants et effets de réfraction du verre","animation"],
+["CSS Text Effects","text-effects.colorion.co","Animations et effets de texte en CSS","animation"],
+["Circle Loaders (?)","circleloaders.dominikakissi.com","Animations de chargement","animation"],
+["Gradient Buttons","gradientbuttons.colorion.co","Styles de boutons en dégradé","composants UI"],
+["Shadertoy","shadertoy.com","Shaders à étudier et remixer","animation"],
+["3Dicons","3dicons.co","Icônes 3D gratuites","composants UI"],
+["Anime.js","animejs.com","Bibliothèque d'animation JavaScript légère","animation"]];
+var s="2026-09-18",c="Check pricing",m="; modèle à part";
+var B=[
+["Code & édition",[
+["Aider","github.com/Aider-AI/aider","Pair programming en terminal, modèles cloud ou locaux","Client open source ; coûts API ou modèle local",s],
+["Claude Code","code.claude.com/docs/en/overview","Agent de code, terminal et projets",c,s],
+["Cline","github.com/cline/cline","Agent pour IDE, terminal et desktop","Client + fournisseur de modèle ; check pricing",s],
+["Cursor","cursor.com","Éditeur et agent de code",c,s],
+["Gemini CLI","github.com/google-gemini/gemini-cli","Agent de code open source en terminal","API/Vertex ou entreprise éligible ; accès grand public retiré",s],
+["GitHub Copilot","github.com/features/copilot","Assistance et agents sur GitHub et IDE",c,s],
+["Goose","github.com/aaif-goose/goose","Agent local extensible, outils MCP",c,s],
+["Kiro","kiro.dev","Agent AWS : IDE et CLI, specs, tests",c,s],
+["OpenAI Codex CLI","openai.com/codex/","Agent OpenAI local en terminal",c,s],
+["Pi","github.com/earendil-works/pi","Agent extensible et embarquable","Client MIT"+m,s]]],
+["App & UI",[
+["Bolt.new","bolt.new","Apps en langage naturel (StackBlitz)",c,s],
+["Dyad","github.com/dyad-sh/dyad","Apps en local, fournisseurs de modèles au choix","Check pricing ; app locale + coûts fournisseur",s],
+["Lovable","lovable.dev","Apps full-stack avec Supabase",c,s],
+["Onlook","onlook.com","Édition visuelle d'interfaces avec le code",c,s],
+["Replit","replit.com","Apps avec Replit Agent",c,s],
+["v0","v0.app","IA de Vercel pour UI/React",c,s]]],
+["Contexte, specs & intégrations",[
+["Caliber","github.com/caliber-ai-org/ai-setup","Génère et synchronise les configs d'agents",c,s],
+["Context7 (MCP)","github.com/upstash/context7","Documentation de bibliothèques comme contexte",c,s],
+["Filesystem MCP","github.com/modelcontextprotocol/servers/tree/main/src/filesystem","Accès contrôlé aux fichiers du projet","Check pricing ; implémentation de référence",s],
+["GitHub MCP","github.com/github/github-mcp-server","Dépôts, issues et pull requests",c,s],
+["Neon (MCP)","github.com/neondatabase/mcp-server-neon","Bases Neon depuis les workflows de dev",c,s],
+["Notion MCP","developers.notion.com/guides/mcp/overview","MCP officiel pour lire et modifier Notion",c,s],
+["OpenSpec","github.com/Fission-AI/OpenSpec","Développement piloté par les specs",c,s],
+["Supabase MCP","github.com/supabase/mcp","MCP officiel : schémas, requêtes, config",c,s]]],
+["Test, revue & sécurité",[
+["Agent QA (MCP)","github.com/vostride/agent-qa","Tests web et mobile en langage naturel","FSL-1.1-ALv2 (usage concurrent restreint) ; coûts du modèle",s],
+["Playwright MCP","github.com/microsoft/playwright-mcp","Automatisation officielle du navigateur","Client Apache-2.0"+m,s],
+["PR-Agent","github.com/The-PR-Agent/pr-agent","Relecteur de PR communautaire (distinct de Qodo)",c,s],
+["Prbl","getprbl.com","Scan des failles courantes du code généré par IA","Scan et GitHub Action gratuits ; payant pour rewriter et dépôts privés ; Python/JS/TS","2026-09-23"],
+["Qodo","qodo.ai","Revue de code IA (ex-CodiumAI)",c,s],
+["Semgrep MCP","github.com/semgrep/semgrep/tree/develop/cli/src/semgrep/mcp","Scan de sécurité via Semgrep",c,s],
+["Sentry (MCP)","github.com/getsentry/sentry-mcp","Erreurs applicatives et diagnostic","Functional Source License ; hébergement à vérifier",s]]],
+["Déploiement & exécution",[
+["Cloudflare (MCP)","github.com/cloudflare/mcp-server-cloudflare","Déploiement et ressources cloud",c,s],
+["E2B","github.com/e2b-dev/E2B","Sandbox cloud sécurisée pour agents",c,s],
+["Publish.my","publish.my","Publication de sites statiques par agent","Gratuit ; statique uniquement ; activation e-mail",s],
+["XcodeBuildMCP","github.com/getsentry/XcodeBuildMCP","Compiler et déboguer des projets Apple",c,s]]],
+["Espaces de travail & usage",[
+["Delta (Zed)","delta.dev","Threads d'agents et revue dans un espace multijoueur","Gratuit en bêta publique ; payant prévu"+m,"2026-09-20"],
+["Duckweed","github.com/MusicMaster4/Duckweed","Agents, shells et diffs Git en local","Code disponible (voir licence)"+m,s],
+["llm.log","github.com/lanesket/llm.log","Coûts, tokens et traces via proxy local","MIT"+m,s],
+["Parallel Code","github.com/johannesjo/parallel-code","Agents dans des worktrees Git isolés","MIT"+m,s],
+["Shep","github.com/shep-ai/shep","Agents parallèles jusqu'aux PR en brouillon","Client MIT ; abonnement/API à part",s],
+["Superagent","github.com/pungme/superagent-desktop","Claude Code ou Codex sur macOS","MIT ; macOS Apple Silicon"+m,s],
+["usage","github.com/aqua5230/usage","Quotas des agents dans la barre de menus","AGPL-3.0"+m,s],
+["Warp Terminal","warp.dev/terminal","Terminal orienté agents","Téléchargeable ; tarif IA à vérifier",s]]]];
+var CL={"prompts":"c-prompts","inspiration":"c-inspiration","design system":"c-design","composants UI":"c-ui","animation":"c-anim"};
+function e(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function lk(u){return '<a href="https://'+e(u)+'" rel="noopener">'+e(u)+'</a>'}
+function kind(t){return /^Check pricing$/.test(t)?["k-ne","Prix non vérifié"]:/MIT|Apache|AGPL|open source|Gratuit|gratuits/i.test(t)?["k-ok","Gratuit / open source"]:["k-wa","Conditions à lire"]}
+var active="";
+function renderA(){
+  document.getElementById("ta").innerHTML=A.map(function(r,i){return '<tr data-cat="'+e(r[3])+'"><td class="n">'+(i+1)+'</td><td class="name">'+e(r[0])+'</td><td class="u">'+lk(r[1])+'</td><td>'+e(r[2])+'</td><td><span class="pill '+CL[r[3]]+'">'+e(r[3])+'</span></td></tr>'}).join("");
+}
+function renderB(){
+  document.getElementById("tb").innerHTML=B.map(function(g){
+    return '<div class="grp"><header><h3>'+e(g[0])+'</h3><span class="cnt">'+g[1].length+' outils</span></header><div class="tw"><table><thead><tr><th>Outil</th><th>Access / scope</th><th>Vérifié</th></tr></thead><tbody>'+
+    g[1].map(function(r){var k=kind(r[3]);return '<tr><td><span class="name">'+e(r[0])+'</span><br><span class="u">'+lk(r[1])+'</span><span class="acc">'+e(r[2])+'</span></td><td><span class="pill '+k[0]+'">'+k[1]+'</span><span class="acc">'+e(r[3])+'</span></td><td class="d">'+r[4]+'</td></tr>'}).join("")+'</tbody></table></div></div>'}).join("");
+}
+function chips(){
+  var cats=["Toutes"].concat(Object.keys(CL));
+  var el=document.getElementById("chips");
+  el.innerHTML=cats.map(function(k,i){return '<button class="chip" aria-pressed="'+(i==0)+'" data-k="'+(i==0?"":e(k))+'">'+e(k)+'</button>'}).join(" ");
+  el.addEventListener("click",function(ev){var b=ev.target.closest("button");if(!b)return;active=b.dataset.k;
+    el.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});apply()});
+}
+function apply(){
+  var q=document.getElementById("f").value.toLowerCase();
+  document.querySelectorAll("#ta tr").forEach(function(tr){tr.hidden=(active&&tr.dataset.cat!==active)||(q&&tr.textContent.toLowerCase().indexOf(q)<0)});
+  document.querySelectorAll("#tb tbody tr").forEach(function(tr){tr.hidden=!!q&&tr.textContent.toLowerCase().indexOf(q)<0});
+  document.querySelectorAll("#tb .grp").forEach(function(g){g.hidden=!g.querySelector("tbody tr:not([hidden])")});
+}
+renderA();renderB();chips();
+document.getElementById("f").addEventListener("input",apply);
+var links=document.querySelectorAll("nav a"),secs=[].map.call(links,function(a){return document.querySelector(a.getAttribute("href"))});
+function spy(){var y=window.scrollY+120,cur=0;secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i});links.forEach(function(a,i){a.classList.toggle("on",i===cur)})}
+window.addEventListener("scroll",spy,{passive:true});spy();
+</script>
+</body>
+</html>
