@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Contact | Page Outils</title>
+<meta name="description" content="Écrire à l'éditeur du site Page Outils.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body class="page">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="site-header"><div class="wrap"><a class="brand" href="outils.html">Page Outils</a></div></header>
+<main id="contenu" class="wrap">
+<h1>Contact</h1>
+<p>Écrivez à l'éditeur du site avec ce formulaire. Les trois champs sont obligatoires.</p>
+<noscript><p class="status err">Erreur : ce formulaire a besoin de JavaScript pour envoyer le message.</p></noscript>
+<!-- À COMPLÉTER : remplacer data-endpoint par l'adresse du service qui reçoit les messages -->
+<form id="contact-form" class="form" data-endpoint="https://site.com/contact" novalidate>
+  <div class="field">
+    <label for="email">Adresse électronique</label>
+    <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-err">
+    <p id="email-err" class="err" hidden></p>
+  </div>
+  <div class="field">
+    <label for="subject">Sujet</label>
+    <input id="subject" name="subject" type="text" autocomplete="off" required aria-describedby="subject-err">
+    <p id="subject-err" class="err" hidden></p>
+  </div>
+  <div class="field">
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="7" required aria-describedby="message-err"></textarea>
+    <p id="message-err" class="err" hidden></p>
+  </div>
+  <button type="submit" class="btn">Envoyer</button>
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+  <p class="info">Les informations saisies sont envoyées pour traiter votre message et conservées 365 jours. Pour en savoir plus, consultez <a href="donnees-personnelles.html">Cookies / Données personnelles</a>.</p>
+</form>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <nav aria-label="Pied de page">
+      <ul>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="aide.html">Aide</a></li>
+        <li><a href="info-site.html">Info site</a></li>
+        <li><a href="accessibilite.html">Accessibilité : non conforme</a></li>
+        <!-- À COMPLÉTER : remplacer l'adresse ci-dessous par celle du site de l'organisme -->
+        <li><a href="https://a-completer.invalid/">Site de L'organisme régulateur de l'IA</a></li>
+        <li><a href="donnees-personnelles.html">Cookies / Données personnelles</a></li>
+        <li><a href="mentions-legales.html">Mentions légales</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+<script src="assets/contact.js" defer></script>
+</body>
+</html>

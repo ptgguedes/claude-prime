@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Outils de vibe coding : deux sources comparées</title>
 <meta name="description" content="Un post X de 25 ressources face à la liste awesome-vibecoding (43 outils vérifiés et datés). Constats au 12 octobre 2026.">
+<link rel="stylesheet" href="assets/site.css">
 <style>
 :root{
   --bg:#fafbfc;--card:#fff;--soft:#f1f4f8;--fg:#0f172a;--mut:#5b6678;--line:#e2e8f0;
@@ -23,11 +24,11 @@ a{color:var(--a);text-underline-offset:3px}
 a:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid var(--a);outline-offset:2px;border-radius:6px}
 .wrap{max-width:1040px;margin:0 auto;padding:0 1.25rem}
 /* nav */
-nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-nav .wrap{display:flex;gap:.4rem;align-items:center;overflow-x:auto;padding-top:.55rem;padding-bottom:.55rem}
-nav b{margin-right:.75rem;white-space:nowrap}
-nav a{color:var(--mut);text-decoration:none;padding:.3rem .75rem;border-radius:999px;font-size:.9rem;white-space:nowrap}
-nav a:hover,nav a.on{background:var(--soft);color:var(--fg)}
+nav.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:.4rem;align-items:center;overflow-x:auto;padding-top:.55rem;padding-bottom:.55rem}
+nav.top b{margin-right:.75rem;white-space:nowrap}
+nav.top a{color:var(--mut);text-decoration:none;padding:.3rem .75rem;border-radius:999px;font-size:.9rem;white-space:nowrap}
+nav.top a:hover,nav.top a.on{background:var(--soft);color:var(--fg)}
 /* hero */
 header{padding:3.5rem 0 2rem;background:
   radial-gradient(60rem 22rem at 85% -10%,color-mix(in srgb,var(--a) 14%,transparent),transparent 70%),
@@ -86,12 +87,11 @@ input[type=search]{flex:1 1 16rem;max-width:26rem;padding:.6rem .9rem;border:1px
 details{margin:1rem 0}summary{cursor:pointer;color:var(--a);font-weight:600}
 img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:14px;margin-top:.75rem}
 .empty{padding:1rem;color:var(--mut)}
-footer{margin:3.5rem 0 2rem;padding-top:1.25rem;border-top:1px solid var(--line);color:var(--mut);font-size:.88rem}
 @media(max-width:720px){.stats{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.card dl{grid-template-columns:1fr}.card dt{margin-top:.4rem}}
 </style>
 </head>
 <body>
-<nav><div class="wrap"><b>Vibe coding</b><a href="#compare">Comparaison</a><a href="#a">Source A</a><a href="#b">Source B</a><a href="#sources">Sources</a></div></nav>
+<nav class="top" aria-label="Sur cette page"><div class="wrap"><b>Vibe coding</b><a href="#compare">Comparaison</a><a href="#a">Source A</a><a href="#b">Source B</a><a href="#sources">Sources</a></div></nav>
 
 <header><div class="wrap">
   <span class="date">Constats au 12 octobre 2026</span>
@@ -144,8 +144,24 @@ footer{margin:3.5rem 0 2rem;padding-top:1.25rem;border-top:1px solid var(--line)
   <h2>Sources</h2>
   <p>Capture du post X (<code>docs/Vibe-coding/Vibe-coding.png</code>) et <a href="https://github.com/Scap-Mehdi/awesome-vibecoding">github.com/Scap-Mehdi/awesome-vibecoding</a>, README anglais relu le 12 oct. 2026 (dernière vérification listée : 4 oct. 2026). Descriptions reformulées en français. Ces informations évoluent : revérifie le README avant de t'en servir.</p>
 </section>
-<footer>Page générée le 12 octobre 2026.</footer>
+<p class="hint">Page générée le 12 octobre 2026.</p>
 </main>
+<footer class="site-footer">
+  <div class="wrap">
+    <nav aria-label="Pied de page">
+      <ul>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="aide.html">Aide</a></li>
+        <li><a href="info-site.html">Info site</a></li>
+        <li><a href="accessibilite.html">Accessibilité : non conforme</a></li>
+        <!-- À COMPLÉTER : remplacer l'adresse ci-dessous par celle du site de l'organisme -->
+        <li><a href="https://a-completer.invalid/">Site de L'organisme régulateur de l'IA</a></li>
+        <li><a href="donnees-personnelles.html">Cookies / Données personnelles</a></li>
+        <li><a href="mentions-legales.html">Mentions légales</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
 <noscript><p class="wrap">Les tableaux nécessitent JavaScript.</p></noscript>
 
 <script>
@@ -254,7 +270,7 @@ function apply(){
 }
 renderA();renderB();chips();
 document.getElementById("f").addEventListener("input",apply);
-var links=document.querySelectorAll("nav a"),secs=[].map.call(links,function(a){return document.querySelector(a.getAttribute("href"))});
+var links=document.querySelectorAll("nav.top a"),secs=[].map.call(links,function(a){return document.querySelector(a.getAttribute("href"))});
 function spy(){var y=window.scrollY+120,cur=0;secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i});links.forEach(function(a,i){a.classList.toggle("on",i===cur)})}
 window.addEventListener("scroll",spy,{passive:true});spy();
 </script>
