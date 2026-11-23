@@ -9,12 +9,12 @@
 :root{
   --bg:#fafbfc;--card:#fff;--soft:#f1f4f8;--fg:#0f172a;--mut:#5b6678;--line:#e2e8f0;
   --a:#6d4aff;--as:#efeaff;--b:#0891b2;--bs:#e0f5fa;--ok:#15803d;--oks:#e3f6e9;--wa:#a16207;--was:#fdf2d0;--ne:#475569;--nes:#eceff3;
-  --sh:0 1px 2px rgba(15,23,42,.05),0 8px 24px -12px rgba(15,23,42,.12)
+  --er:#b91c1c;--sh:0 1px 2px rgba(15,23,42,.05),0 8px 24px -12px rgba(15,23,42,.12)
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#0b1017;--card:#121a24;--soft:#18222f;--fg:#e8edf4;--mut:#9aa7b8;--line:#243142;
   --a:#a28bff;--as:#241d4a;--b:#3cc4de;--bs:#0d2e38;--ok:#5fd68a;--oks:#0f2d1a;--wa:#f0c24b;--was:#33290c;--ne:#b4bfce;--nes:#1d2735;
-  --sh:none}}
+  --er:#ff8a8a;--sh:none}}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:5rem}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -88,6 +88,24 @@ img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:14px;m
 .empty{padding:1rem;color:var(--mut)}
 footer{margin:3.5rem 0 2rem;padding-top:1.25rem;border-top:1px solid var(--line);color:var(--mut);font-size:.88rem}
 @media(max-width:720px){.stats{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.card dl{grid-template-columns:1fr}.card dt{margin-top:.4rem}}
+/* Édition et commentaires */
+.ed{margin:.6rem 0 0}.ed summary{font-size:.88rem}
+.edwrap{margin-top:.6rem;padding:.9rem;background:var(--soft);border:1px solid var(--line);border-radius:10px;display:grid;gap:1.1rem;min-width:min(100%,16rem);font-weight:400;color:var(--fg)}
+.edwrap h4{margin:0 0 .5rem;font-size:.95rem}
+.edwrap .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:.7rem}
+.fld{display:grid;gap:.25rem;align-content:start;min-width:0;margin-bottom:.1rem}.fld label{font-size:.82rem;font-weight:600}
+.fld input,.fld select,.fld textarea{width:100%;font:inherit;font-size:.92rem;color:var(--fg);background:var(--card);border:1px solid var(--mut);border-radius:8px;padding:.45rem .6rem}
+.acts{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:.7rem}
+.btn{font:inherit;font-size:.9rem;font-weight:600;background:var(--fg);color:var(--bg);border:0;border-radius:8px;padding:.45rem .9rem;cursor:pointer}
+.btn.ghost{background:none;color:var(--fg);border:1px solid var(--mut)}
+.btn[disabled]{opacity:.55;cursor:progress}
+.msg{font-size:.88rem}.msg.bad,.hint.bad{color:var(--er)}
+.cl{list-style:none;margin:0 0 .8rem;padding:0;display:grid;gap:.6rem}
+.cl li{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem}
+.cl li p{margin:.2rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere;max-width:none}
+.cl time{color:var(--mut);font-size:.8rem;margin-left:.5rem}
+.cl .none{color:var(--mut);background:none;border-style:dashed}
+tr.mod .name::after{content:" (modifié)";color:var(--mut);font-weight:400;font-size:.8rem}
 </style>
 </head>
 <body>
@@ -129,6 +147,7 @@ footer{margin:3.5rem 0 2rem;padding-top:1.25rem;border-top:1px solid var(--line)
 <section id="a">
   <h2>Source A : les 25 ressources du post</h2>
   <p class="hint">Les URL marquées (?) sont écrites en petit sur la capture : à vérifier avant usage. Les catégories sont mon interprétation.</p>
+  <p id="apistate" class="hint" role="status"></p>
   <div class="bar"><input type="search" id="f" placeholder="Filtrer les deux tableaux" aria-label="Filtrer les deux tableaux"><span id="chips"></span></div>
   <div class="tw"><table><thead><tr><th>n°</th><th>Nom</th><th>URL</th><th>Description</th><th>Catégorie</th></tr></thead><tbody id="ta"></tbody></table></div>
   <details><summary>Voir la capture d'origine</summary><img src="docs/Vibe-coding/Vibe-coding.png" alt="Capture du post X de Himanshu Hingorani du 9 octobre 2026" loading="lazy"></details>
@@ -230,14 +249,28 @@ var CL={"prompts":"c-prompts","inspiration":"c-inspiration","design system":"c-d
 function e(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
 function lk(u){return '<a href="https://'+e(u)+'" rel="noopener">'+e(u)+'</a>'}
 function kind(t){return /^Check pricing$/.test(t)?["k-ne","Prix non vérifié"]:/MIT|Apache|AGPL|open source|Gratuit|gratuits/i.test(t)?["k-ok","Gratuit / open source"]:["k-wa","Conditions à lire"]}
-var active="";
+var API="";/* À COMPLÉTER : adresse publique du Worker, par exemple https://outils-api.mon-compte.workers.dev. Vide = page en lecture seule, comme avant. */
+var active="",online=false,locked=false,editKey="",edited={},comments={},note={};
+/* Fiches d'origine (tableaux A et B ci-dessus) et identifiants fixes : a-0… pour la source A, b-0… pour la source B, dans l'ordre actuel. */
+var seed={},tools={},aIds=[],bIds=[];
+A.forEach(function(r,i){var id="a-"+i;aIds.push(id);seed[id]={name:r[0],url:r[1],desc:r[2],cat:r[3]}});
+B.forEach(function(g){g[1].forEach(function(r){var id="b-"+bIds.length;bIds.push(id);seed[id]={name:r[0],url:r[1],desc:r[2],access:r[3],date:r[4],group:g[0]}})});
+var GROUPS=B.map(function(g){return g[0]});
+var LIM={name:120,url:200,desc:600,access:300,author:40,text:1000};
+function reset(id){tools[id]=Object.assign({},seed[id])}
+Object.keys(seed).forEach(reset);
+function cm(id){return comments[id]||[]}
+function search(id,extra){var t=tools[id];return [extra,t.name,t.url,t.desc,t.cat,t.access,t.date,t.group,t.access?kind(t.access)[1]:""].concat(cm(id).map(function(c){return c.author+" "+c.text})).join(" ").toLowerCase()}
+function panel(id){return online?'<details class="ed" data-id="'+id+'"><summary>Modifier · Commentaires ('+cm(id).length+')</summary><div class="edwrap"></div></details>':""}
+function rowA(id,i){var t=tools[id];return '<tr data-id="'+id+'" data-cat="'+e(t.cat)+'" data-q="'+e(search(id,String(i+1)))+'"'+(edited[id]?' class="mod"':'')+'><td class="n">'+(i+1)+'</td><td class="name">'+e(t.name)+'</td><td class="u">'+lk(t.url)+'</td><td>'+e(t.desc)+panel(id)+'</td><td><span class="pill '+(CL[t.cat]||"")+'">'+e(t.cat)+'</span></td></tr>'}
+function rowB(id){var t=tools[id],k=kind(t.access);return '<tr data-id="'+id+'" data-q="'+e(search(id,""))+'"'+(edited[id]?' class="mod"':'')+'><td><span class="name">'+e(t.name)+'</span><br><span class="u">'+lk(t.url)+'</span><span class="acc">'+e(t.desc)+'</span>'+panel(id)+'</td><td><span class="pill '+k[0]+'">'+k[1]+'</span><span class="acc">'+e(t.access)+'</span></td><td class="d">'+e(t.date)+'</td></tr>'}
 function renderA(){
-  document.getElementById("ta").innerHTML=A.map(function(r,i){return '<tr data-cat="'+e(r[3])+'"><td class="n">'+(i+1)+'</td><td class="name">'+e(r[0])+'</td><td class="u">'+lk(r[1])+'</td><td>'+e(r[2])+'</td><td><span class="pill '+CL[r[3]]+'">'+e(r[3])+'</span></td></tr>'}).join("");
+  document.getElementById("ta").innerHTML=aIds.map(function(id,i){return rowA(id,i)}).join("");
 }
 function renderB(){
-  document.getElementById("tb").innerHTML=B.map(function(g){
-    return '<div class="grp"><header><h3>'+e(g[0])+'</h3><span class="cnt">'+g[1].length+' outils</span></header><div class="tw"><table><thead><tr><th>Outil</th><th>Access / scope</th><th>Vérifié</th></tr></thead><tbody>'+
-    g[1].map(function(r){var k=kind(r[3]);return '<tr><td><span class="name">'+e(r[0])+'</span><br><span class="u">'+lk(r[1])+'</span><span class="acc">'+e(r[2])+'</span></td><td><span class="pill '+k[0]+'">'+k[1]+'</span><span class="acc">'+e(r[3])+'</span></td><td class="d">'+r[4]+'</td></tr>'}).join("")+'</tbody></table></div></div>'}).join("");
+  document.getElementById("tb").innerHTML=GROUPS.map(function(g){var ids=bIds.filter(function(id){return tools[id].group===g});if(!ids.length)return "";
+    return '<div class="grp"><header><h3>'+e(g)+'</h3><span class="cnt">'+ids.length+' outils</span></header><div class="tw"><table><thead><tr><th>Outil</th><th>Access / scope</th><th>Vérifié</th></tr></thead><tbody>'+
+    ids.map(function(id){return rowB(id)}).join("")+'</tbody></table></div></div>'}).join("");
 }
 function chips(){
   var cats=["Toutes"].concat(Object.keys(CL));
@@ -248,12 +281,84 @@ function chips(){
 }
 function apply(){
   var q=document.getElementById("f").value.toLowerCase();
-  document.querySelectorAll("#ta tr").forEach(function(tr){tr.hidden=(active&&tr.dataset.cat!==active)||(q&&tr.textContent.toLowerCase().indexOf(q)<0)});
-  document.querySelectorAll("#tb tbody tr").forEach(function(tr){tr.hidden=!!q&&tr.textContent.toLowerCase().indexOf(q)<0});
+  document.querySelectorAll("#ta tr").forEach(function(tr){tr.hidden=(active&&tr.dataset.cat!==active)||(q&&tr.dataset.q.indexOf(q)<0)});
+  document.querySelectorAll("#tb tbody tr").forEach(function(tr){tr.hidden=!!q&&tr.dataset.q.indexOf(q)<0});
   document.querySelectorAll("#tb .grp").forEach(function(g){g.hidden=!g.querySelector("tbody tr:not([hidden])")});
+}
+/* ---- Édition et commentaires (actifs seulement si le Worker répond) ---- */
+function api(method,path,body,key){
+  var h={Accept:"application/json"};if(body)h["Content-Type"]="application/json";if(key)h["X-Edit-Key"]=key;
+  var c=new AbortController(),t=setTimeout(function(){c.abort()},15000);
+  return fetch(API+path,{method:method,headers:h,body:body?JSON.stringify(body):undefined,credentials:"omit",signal:c.signal}).then(function(r){
+    clearTimeout(t);
+    return r.json().catch(function(){return {}}).then(function(d){if(!r.ok){var er=new Error(d.error||("Erreur "+r.status));er.status=r.status;throw er}return d})
+  },function(er){clearTimeout(t);throw new Error(er&&er.name==="AbortError"?"Le serveur n'a pas répondu à temps.":"Impossible de joindre le serveur.")})
+}
+function fld(id,k,label,v,o){o=o||{};var i="f-"+id+"-"+k,h='<div class="fld"><label for="'+i+'">'+label+'</label>';
+  if(o.sel)h+='<select id="'+i+'" name="'+k+'">'+o.sel.map(function(x){return '<option'+(x===v?" selected":"")+'>'+e(x)+'</option>'}).join("")+'</select>';
+  else if(o.area)h+='<textarea id="'+i+'" name="'+k+'" rows="3" maxlength="'+o.max+'" required>'+e(v)+'</textarea>';
+  else h+='<input id="'+i+'" name="'+k+'" type="'+(o.type||"text")+'" value="'+e(v)+'"'+(o.max?' maxlength="'+o.max+'"':"")+' required>';
+  return h+'</div>'}
+function editForm(id){var t=tools[id],a=id[0]==="a",h='<form class="edit" data-id="'+id+'"><h4>Modifier la fiche</h4><div class="grid">';
+  h+=fld(id,"name","Nom",t.name,{max:LIM.name})+fld(id,"url","URL (sans https://)",t.url,{max:LIM.url})+fld(id,"desc",a?"Description":"Usage",t.desc,{area:1,max:LIM.desc});
+  if(a)h+=fld(id,"cat","Catégorie",t.cat,{sel:Object.keys(CL)});
+  else h+=fld(id,"access","Access / scope",t.access,{max:LIM.access})+fld(id,"date","Vérifié le",t.date,{type:"date"})+fld(id,"group","Groupe (tâche)",t.group,{sel:GROUPS});
+  h+='</div>';
+  if(locked)h+='<div class="fld"><label for="f-'+id+'-key">Mot de passe d’édition</label><input id="f-'+id+'-key" name="key" type="password" autocomplete="off" value="'+e(editKey)+'"></div>';
+  return h+'<div class="acts"><button type="submit" class="btn">Enregistrer</button><button type="button" class="btn ghost" data-reset>Rétablir l’original</button><span class="msg" role="status"></span></div></form>'}
+function fmt(s){try{return new Date(s).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}catch(x){return s}}
+function commentsHtml(id){var l=cm(id);return l.length?l.map(function(c){return '<li><strong>'+e(c.author)+'</strong><time datetime="'+e(c.at)+'">'+e(fmt(c.at))+'</time><p>'+e(c.text)+'</p></li>'}).join(""):'<li class="none">Aucun commentaire pour le moment.</li>'}
+function commentForm(id){return '<form class="addc" data-id="'+id+'"><div class="fld"><label for="c-'+id+'-a">Pseudo (facultatif)</label><input id="c-'+id+'-a" name="author" maxlength="'+LIM.author+'" autocomplete="nickname"></div><div class="fld"><label for="c-'+id+'-t">Votre commentaire</label><textarea id="c-'+id+'-t" name="text" rows="3" maxlength="'+LIM.text+'" required></textarea></div><div class="acts"><button type="submit" class="btn">Ajouter le commentaire</button><span class="msg" role="status"></span></div></form>'}
+function fill(d){var id=d.dataset.id,w=d.querySelector(".edwrap");if(w.firstChild)return;
+  w.innerHTML=editForm(id)+'<div class="cm"><h4>Commentaires</h4><ul class="cl">'+commentsHtml(id)+'</ul>'+commentForm(id)+'</div>';
+  if(note[id]){say(w.querySelector("form.edit"),note[id]);delete note[id]}}
+function say(f,t,bad){var m=f.querySelector(".msg");m.textContent=t;m.className="msg"+(bad?" bad":"")}
+function busy(f,b){f.querySelectorAll("button").forEach(function(x){x.disabled=b})}
+function reopen(id,open){if(!open)return;var d=document.querySelector('details.ed[data-id="'+id+'"]');if(d)d.open=true}
+function refreshRow(id){
+  var old=document.querySelector('tr[data-id="'+id+'"]');if(!old)return;
+  var dt=old.querySelector("details.ed"),open=dt&&dt.open;
+  if(id[0]==="b"&&old.closest(".grp").querySelector("h3").textContent!==tools[id].group){renderB();apply();reopen(id,open);return}
+  var tmp=document.createElement("tbody");tmp.innerHTML=id[0]==="a"?rowA(id,aIds.indexOf(id)):rowB(id);
+  old.replaceWith(tmp.firstElementChild);apply();reopen(id,open);
+}
+function saveTool(f){var id=f.dataset.id,p={};
+  ["name","url","desc","cat","access","date","group"].forEach(function(k){if(f.elements[k])p[k]=f.elements[k].value});
+  if(locked&&f.elements.key)editKey=f.elements.key.value;
+  say(f,"Enregistrement…");busy(f,true);
+  api("PUT","/tools/"+id,p,locked?editKey:"").then(function(d){tools[id]=d.tool;edited[id]=true;note[id]="Fiche enregistrée.";refreshRow(id)},function(er){say(f,"Erreur : "+er.message,true);busy(f,false)});
+}
+function addComment(f){var id=f.dataset.id;say(f,"Envoi…");busy(f,true);
+  api("POST","/tools/"+id+"/comments",{author:f.elements.author.value,text:f.elements.text.value}).then(function(d){
+    (comments[id]=comments[id]||[]).push(d.comment);
+    var dt=f.closest("details");dt.querySelector(".cl").innerHTML=commentsHtml(id);dt.querySelector("summary").textContent="Modifier · Commentaires ("+cm(id).length+")";
+    f.closest("tr").dataset.q=search(id,id[0]==="a"?String(aIds.indexOf(id)+1):"");
+    f.elements.text.value="";busy(f,false);say(f,"Commentaire ajouté.");
+  },function(er){say(f,"Erreur : "+er.message,true);busy(f,false)});
+}
+document.addEventListener("toggle",function(ev){var d=ev.target;if(d.classList&&d.classList.contains("ed")&&d.open)fill(d)},true);
+document.addEventListener("submit",function(ev){var f=ev.target;if(!f.classList)return;
+  if(f.classList.contains("edit")){ev.preventDefault();saveTool(f)}
+  else if(f.classList.contains("addc")){ev.preventDefault();addComment(f)}});
+document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest("[data-reset]");if(!b)return;
+  var f=b.form,id=f.dataset.id;if(locked&&f.elements.key)editKey=f.elements.key.value;
+  say(f,"Rétablissement…");busy(f,true);
+  api("DELETE","/tools/"+id,null,locked?editKey:"").then(function(){reset(id);delete edited[id];note[id]="Fiche d’origine rétablie.";refreshRow(id)},function(er){say(f,"Erreur : "+er.message,true);busy(f,false)});
+});
+function setNote(t,bad){var n=document.getElementById("apistate");if(n){n.textContent=t;n.className="hint"+(bad?" bad":"")}}
+function loadState(){
+  setNote("Chargement des modifications…");
+  api("GET","/state").then(function(s){
+    locked=!!s.edit_protected;
+    Object.keys(s.tools||{}).forEach(function(id){if(!seed[id])return;tools[id]=Object.assign({},seed[id],s.tools[id]);edited[id]=true;
+      if(tools[id].group&&GROUPS.indexOf(tools[id].group)<0)tools[id].group=seed[id].group});
+    comments=s.comments||{};online=true;renderA();renderB();apply();
+    setNote("Édition active : ouvrez « Modifier · Commentaires » sous un outil. Les changements sont enregistrés pour tous les visiteurs."+(locked?" La modification des fiches demande le mot de passe d’édition ; les commentaires sont libres.":""));
+  },function(){setNote("Édition indisponible pour le moment : les données d’origine sont affichées.",true)});
 }
 renderA();renderB();chips();
 document.getElementById("f").addEventListener("input",apply);
+if(API)loadState();
 var links=document.querySelectorAll("nav a"),secs=[].map.call(links,function(a){return document.querySelector(a.getAttribute("href"))});
 function spy(){var y=window.scrollY+120,cur=0;secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i});links.forEach(function(a,i){a.classList.toggle("on",i===cur)})}
 window.addEventListener("scroll",spy,{passive:true});spy();

@@ -1,0 +1,14 @@
+# Worker qui enregistre les modifications et les commentaires de outils.html dans R2.
+# Aucun secret ici : le mot de passe d'édition (EDIT_KEY) se crée dans Cloudflare, pas dans ce fichier.
+name = "outils-api"
+main = "index.js"
+compatibility_date = "2025-09-01"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "outils-data"
+
+[vars]
+# Sites autorisés à appeler le Worker, séparés par des virgules.
+# « * » remplace un nom de sous-domaine (aperçus des branches Cloudflare Pages).
+ALLOWED_ORIGINS = "https://claude-prime-51g.pages.dev,https://*.claude-prime-51g.pages.dev,https://ptgguedes.github.io"
