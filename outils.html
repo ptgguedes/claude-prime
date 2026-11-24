@@ -104,6 +104,7 @@ footer{margin:3.5rem 0 2rem;padding-top:1.25rem;border-top:1px solid var(--line)
 .cl li{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem}
 .cl li p{margin:.2rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere;max-width:none}
 .cl time{color:var(--mut);font-size:.8rem;margin-left:.5rem}
+.more{margin:0 0 .8rem}.more:empty{display:none}
 .cl .none{color:var(--mut);background:none;border-style:dashed}
 tr.mod .name::after{content:" (modifié)";color:var(--mut);font-weight:400;font-size:.8rem}
 </style>
@@ -250,7 +251,7 @@ function e(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replac
 function lk(u){return '<a href="https://'+e(u)+'" rel="noopener">'+e(u)+'</a>'}
 function kind(t){return /^Check pricing$/.test(t)?["k-ne","Prix non vérifié"]:/MIT|Apache|AGPL|open source|Gratuit|gratuits/i.test(t)?["k-ok","Gratuit / open source"]:["k-wa","Conditions à lire"]}
 var API="";/* À COMPLÉTER : adresse publique du Worker, par exemple https://outils-api.mon-compte.workers.dev. Vide = page en lecture seule, comme avant. */
-var active="",online=false,locked=false,editKey="",edited={},comments={},note={};
+var active="",online=false,locked=false,editKey="",edited={},cnt={},cmt={},note={};
 /* Fiches d'origine (tableaux A et B ci-dessus) et identifiants fixes : a-0… pour la source A, b-0… pour la source B, dans l'ordre actuel. */
 var seed={},tools={},aIds=[],bIds=[];
 A.forEach(function(r,i){var id="a-"+i;aIds.push(id);seed[id]={name:r[0],url:r[1],desc:r[2],cat:r[3]}});
@@ -259,9 +260,10 @@ var GROUPS=B.map(function(g){return g[0]});
 var LIM={name:120,url:200,desc:600,access:300,author:40,text:1000};
 function reset(id){tools[id]=Object.assign({},seed[id])}
 Object.keys(seed).forEach(reset);
-function cm(id){return comments[id]||[]}
-function search(id,extra){var t=tools[id];return [extra,t.name,t.url,t.desc,t.cat,t.access,t.date,t.group,t.access?kind(t.access)[1]:""].concat(cm(id).map(function(c){return c.author+" "+c.text})).join(" ").toLowerCase()}
-function panel(id){return online?'<details class="ed" data-id="'+id+'"><summary>Modifier · Commentaires ('+cm(id).length+')</summary><div class="edwrap"></div></details>':""}
+function cm(id){return (cmt[id]&&cmt[id].list)||[]}
+function nb(id){return cmt[id]&&cmt[id].loaded?Math.max(cm(id).length,cnt[id]||0):(cnt[id]||0)}
+function search(id,extra){var t=tools[id];return [extra,t.name,t.url,t.desc,t.cat,t.access,t.date,t.group,t.access?kind(t.access)[1]:""].join(" ").toLowerCase()}
+function panel(id){return online?'<details class="ed" data-id="'+id+'"><summary>Modifier · Commentaires ('+nb(id)+')</summary><div class="edwrap"></div></details>':""}
 function rowA(id,i){var t=tools[id];return '<tr data-id="'+id+'" data-cat="'+e(t.cat)+'" data-q="'+e(search(id,String(i+1)))+'"'+(edited[id]?' class="mod"':'')+'><td class="n">'+(i+1)+'</td><td class="name">'+e(t.name)+'</td><td class="u">'+lk(t.url)+'</td><td>'+e(t.desc)+panel(id)+'</td><td><span class="pill '+(CL[t.cat]||"")+'">'+e(t.cat)+'</span></td></tr>'}
 function rowB(id){var t=tools[id],k=kind(t.access);return '<tr data-id="'+id+'" data-q="'+e(search(id,""))+'"'+(edited[id]?' class="mod"':'')+'><td><span class="name">'+e(t.name)+'</span><br><span class="u">'+lk(t.url)+'</span><span class="acc">'+e(t.desc)+'</span>'+panel(id)+'</td><td><span class="pill '+k[0]+'">'+k[1]+'</span><span class="acc">'+e(t.access)+'</span></td><td class="d">'+e(t.date)+'</td></tr>'}
 function renderA(){
@@ -307,11 +309,24 @@ function editForm(id){var t=tools[id],a=id[0]==="a",h='<form class="edit" data-i
   if(locked)h+='<div class="fld"><label for="f-'+id+'-key">Mot de passe d’édition</label><input id="f-'+id+'-key" name="key" type="password" autocomplete="off" value="'+e(editKey)+'"></div>';
   return h+'<div class="acts"><button type="submit" class="btn">Enregistrer</button><button type="button" class="btn ghost" data-reset>Rétablir l’original</button><span class="msg" role="status"></span></div></form>'}
 function fmt(s){try{return new Date(s).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}catch(x){return s}}
-function commentsHtml(id){var l=cm(id);return l.length?l.map(function(c){return '<li><strong>'+e(c.author)+'</strong><time datetime="'+e(c.at)+'">'+e(fmt(c.at))+'</time><p>'+e(c.text)+'</p></li>'}).join(""):'<li class="none">Aucun commentaire pour le moment.</li>'}
+function commentsHtml(id){var c=cmt[id]||{},l=cm(id);
+  if(c.err)return '<li class="none">'+e(c.err)+'</li>';
+  if(!c.loaded)return '<li class="none">Chargement des commentaires…</li>';
+  return (l.length?l.map(function(c){return '<li><strong>'+e(c.auteur)+'</strong><time datetime="'+e(c.cree_le)+'">'+e(fmt(c.cree_le))+'</time><p>'+e(c.texte)+'</p></li>'}).join(""):'<li class="none">Aucun commentaire pour le moment.</li>')}
+function moreBtn(id){return cmt[id]&&cmt[id].next?'<button type="button" class="btn ghost" data-more="'+id+'">Voir les commentaires plus anciens</button>':""}
+function paint(id){var d=document.querySelector('details.ed[data-id="'+id+'"]');if(!d)return;
+  d.querySelector(".cl").innerHTML=commentsHtml(id);d.querySelector(".more").innerHTML=moreBtn(id);d.querySelector("summary").textContent="Modifier · Commentaires ("+nb(id)+")"}
+/* 20 commentaires par page, du plus récent au plus ancien ; « next » est le curseur de la page suivante. */
+function loadComments(id,more){var c=cmt[id]=cmt[id]||{list:[],next:null,loaded:false};
+  if(c.busy)return;c.busy=true;c.err="";
+  api("GET","/api/outils/"+id+"/commentaires"+(more&&c.next?"?avant="+encodeURIComponent(c.next):"")).then(function(d){
+    c.list=more?c.list.concat(d.commentaires):d.commentaires;c.next=d.suivant;c.loaded=true;c.busy=false;paint(id)
+  },function(er){c.busy=false;c.err="Commentaires indisponibles : "+er.message;paint(id)})}
 function commentForm(id){return '<form class="addc" data-id="'+id+'"><div class="fld"><label for="c-'+id+'-a">Pseudo (facultatif)</label><input id="c-'+id+'-a" name="author" maxlength="'+LIM.author+'" autocomplete="nickname"></div><div class="fld"><label for="c-'+id+'-t">Votre commentaire</label><textarea id="c-'+id+'-t" name="text" rows="3" maxlength="'+LIM.text+'" required></textarea></div><div class="acts"><button type="submit" class="btn">Ajouter le commentaire</button><span class="msg" role="status"></span></div></form>'}
 function fill(d){var id=d.dataset.id,w=d.querySelector(".edwrap");if(w.firstChild)return;
-  w.innerHTML=editForm(id)+'<div class="cm"><h4>Commentaires</h4><ul class="cl">'+commentsHtml(id)+'</ul>'+commentForm(id)+'</div>';
-  if(note[id]){say(w.querySelector("form.edit"),note[id]);delete note[id]}}
+  w.innerHTML=editForm(id)+'<div class="cm"><h4>Commentaires</h4><ul class="cl">'+commentsHtml(id)+'</ul><div class="more">'+moreBtn(id)+'</div>'+commentForm(id)+'</div>';
+  if(note[id]){say(w.querySelector("form.edit"),note[id]);delete note[id]}
+  if(!(cmt[id]&&cmt[id].loaded))loadComments(id)}
 function say(f,t,bad){var m=f.querySelector(".msg");m.textContent=t;m.className="msg"+(bad?" bad":"")}
 function busy(f,b){f.querySelectorAll("button").forEach(function(x){x.disabled=b})}
 function reopen(id,open){if(!open)return;var d=document.querySelector('details.ed[data-id="'+id+'"]');if(d)d.open=true}
@@ -329,10 +344,8 @@ function saveTool(f){var id=f.dataset.id,p={};
   api("PUT","/tools/"+id,p,locked?editKey:"").then(function(d){tools[id]=d.tool;edited[id]=true;note[id]="Fiche enregistrée.";refreshRow(id)},function(er){say(f,"Erreur : "+er.message,true);busy(f,false)});
 }
 function addComment(f){var id=f.dataset.id;say(f,"Envoi…");busy(f,true);
-  api("POST","/tools/"+id+"/comments",{author:f.elements.author.value,text:f.elements.text.value}).then(function(d){
-    (comments[id]=comments[id]||[]).push(d.comment);
-    var dt=f.closest("details");dt.querySelector(".cl").innerHTML=commentsHtml(id);dt.querySelector("summary").textContent="Modifier · Commentaires ("+cm(id).length+")";
-    f.closest("tr").dataset.q=search(id,id[0]==="a"?String(aIds.indexOf(id)+1):"");
+  api("POST","/api/outils/"+id+"/commentaires",{author:f.elements.author.value,text:f.elements.text.value}).then(function(d){
+    var c=cmt[id]=cmt[id]||{list:[],next:null,loaded:false};c.list.unshift(d.commentaire);cnt[id]=(cnt[id]||0)+1;paint(id);
     f.elements.text.value="";busy(f,false);say(f,"Commentaire ajouté.");
   },function(er){say(f,"Erreur : "+er.message,true);busy(f,false)});
 }
@@ -340,7 +353,8 @@ document.addEventListener("toggle",function(ev){var d=ev.target;if(d.classList&&
 document.addEventListener("submit",function(ev){var f=ev.target;if(!f.classList)return;
   if(f.classList.contains("edit")){ev.preventDefault();saveTool(f)}
   else if(f.classList.contains("addc")){ev.preventDefault();addComment(f)}});
-document.addEventListener("click",function(ev){var b=ev.target.closest&&ev.target.closest("[data-reset]");if(!b)return;
+document.addEventListener("click",function(ev){var m=ev.target.closest&&ev.target.closest("[data-more]");if(m){loadComments(m.dataset.more,true);return}
+  var b=ev.target.closest&&ev.target.closest("[data-reset]");if(!b)return;
   var f=b.form,id=f.dataset.id;if(locked&&f.elements.key)editKey=f.elements.key.value;
   say(f,"Rétablissement…");busy(f,true);
   api("DELETE","/tools/"+id,null,locked?editKey:"").then(function(){reset(id);delete edited[id];note[id]="Fiche d’origine rétablie.";refreshRow(id)},function(er){say(f,"Erreur : "+er.message,true);busy(f,false)});
@@ -352,7 +366,7 @@ function loadState(){
     locked=!!s.edit_protected;
     Object.keys(s.tools||{}).forEach(function(id){if(!seed[id])return;tools[id]=Object.assign({},seed[id],s.tools[id]);edited[id]=true;
       if(tools[id].group&&GROUPS.indexOf(tools[id].group)<0)tools[id].group=seed[id].group});
-    comments=s.comments||{};online=true;renderA();renderB();apply();
+    cnt=s.counts||{};online=true;renderA();renderB();apply();
     setNote("Édition active : ouvrez « Modifier · Commentaires » sous un outil. Les changements sont enregistrés pour tous les visiteurs."+(locked?" La modification des fiches demande le mot de passe d’édition ; les commentaires sont libres.":""));
   },function(){setNote("Édition indisponible pour le moment : les données d’origine sont affichées.",true)});
 }

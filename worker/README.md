@@ -1,47 +1,36 @@
 # Worker « outils-api »
 
-Enregistre dans R2 les modifications de fiches et les commentaires de `outils.html`.
-Les tableaux d'origine restent dans `outils.html` : si le Worker est arrêté, la page s'affiche comme avant.
+Fiches des outils → **R2** (liaison `DATA`). Commentaires → **D1** (liaison `DB`, base `projet-db`).
+Aucun secret dans ce dossier.
 
-## Ce que fait le Worker
+## Routes
+| Route | Rôle |
+|---|---|
+| `GET /state` | fiches modifiées + nombre de commentaires par outil |
+| `PUT` / `DELETE /tools/:id` | modifier / rétablir une fiche (mot de passe `EDIT_KEY` s'il existe) |
+| `GET /api/outils/:id/commentaires` | les 20 derniers ; `?avant=<curseur>` pour les plus anciens (`suivant` dans la réponse) |
+| `POST /api/outils/:id/commentaires` | ajouter un commentaire (`author`, `text`) |
+| `POST /api/admin/reprise-r2` | reprise unique depuis R2 (voir plus bas) |
 
-| Route | Rôle | Protégée par `EDIT_KEY` |
-|---|---|---|
-| `GET /state` | renvoie les fiches modifiées et tous les commentaires | non |
-| `PUT /tools/:id` | remplace la fiche d'un outil (`a-0`… source A, `b-0`… source B) | oui |
-| `DELETE /tools/:id` | rétablit la fiche d'origine (les commentaires restent) | oui |
-| `POST /tools/:id/comments` | ajoute un commentaire (pseudo facultatif, 1 000 caractères) | non |
+Toutes les requêtes SQL passent par `prepare().bind()`. Tâche planifiée : chaque jour à 03:17 UTC, suppression des commentaires de plus de `RETENTION_MONTHS` (12) mois.
 
-Tout est stocké dans un seul objet R2, `state.json`. Les écritures sont conditionnelles et rejouées en cas de conflit.
-Toute écriture doit venir d'un site listé dans `ALLOWED_ORIGINS`. Les identifiants `a-N` / `b-N` suivent l'ordre des
-tableaux `A` et `B` d'`outils.html` : n'insérez pas d'outil au milieu, ajoutez-les à la fin.
+## À régler par vous
+1. `wrangler.jsonc` : remplacer `A_COMPLETER_ID_DE_LA_BASE_D1` par l'identifiant de `projet-db` (Cloudflare > D1) ; vérifier `bucket_name` (R2).
+2. GitHub > Settings > Secrets > Actions : `CLOUDFLARE_API_TOKEN` (droits Workers Scripts:Edit + D1:Edit) et `CLOUDFLARE_ACCOUNT_ID`.
+3. Cloudflare > Worker > Settings : secret `EDIT_KEY` (facultatif pour les fiches, **obligatoire** pour la reprise R2).
+4. `outils.html` : renseigner `var API` avec l'adresse du Worker.
 
-## Réglages dans Cloudflare (à faire une fois)
+Le workflow `.github/workflows/deploy-worker.yml` applique `wrangler d1 migrations apply projet-db --remote` puis déploie.
 
-1. **R2** : activer R2, puis créer un bucket privé nommé `outils-data` (ou un autre nom, à reporter dans `wrangler.toml`).
-2. **Worker** : créer le Worker `outils-api` et y déployer `index.js`.
-3. **Liaison R2** : Worker > Settings > Bindings > R2 bucket, variable `BUCKET`, bucket `outils-data`.
-4. **Variable `ALLOWED_ORIGINS`** : adresses des sites autorisés, séparées par des virgules (valeur par défaut dans `wrangler.toml`).
-5. **Secret `EDIT_KEY`** (recommandé) : mot de passe demandé pour modifier ou rétablir une fiche. Sans lui, tout visiteur peut modifier les fiches.
-6. Copier l'adresse du Worker (`https://outils-api.<compte>.workers.dev`) dans la ligne `var API="";` d'`outils.html`.
+## Reprise unique des anciens commentaires (R2 → D1) — NON lancée
+Les anciens commentaires de `state.json > comments` ne sont jamais supprimés de R2. La reprise utilise l'identifiant du commentaire (`INSERT OR IGNORE`) : la relancer ne crée pas de doublon ; les commentaires déjà plus vieux que 12 mois sont ignorés.
 
-### Déploiement avec la ligne de commande (facultatif)
+    # 1. simulation (n'écrit rien)
+    curl -X POST https://<worker>/api/admin/reprise-r2 -H "X-Edit-Key: <EDIT_KEY>" -H "Content-Type: application/json" -d '{}'
+    # 2. reprise réelle, seulement après votre accord
+    curl -X POST https://<worker>/api/admin/reprise-r2 -H "X-Edit-Key: <EDIT_KEY>" -H "Content-Type: application/json" -d '{"confirmer":true}'
 
-```
-cd worker
-npx wrangler login
-npx wrangler r2 bucket create outils-data
-npx wrangler secret put EDIT_KEY      # vous tapez le mot de passe, il n'est écrit nulle part
-npx wrangler deploy
-```
-
-Attention : `wrangler deploy` remplace les variables déclarées dans `wrangler.toml` (`ALLOWED_ORIGINS`) par celles du fichier.
-
-## Test en local (sans compte Cloudflare)
-
-```
-cd worker
-npx wrangler dev --local --var EDIT_KEY:essai
-```
-
-R2 est alors simulé sur votre machine.
+## Test local (sans compte Cloudflare)
+    npx wrangler d1 migrations apply projet-db --local --persist-to /tmp/p
+    npx wrangler dev --local --persist-to /tmp/p --test-scheduled --var EDIT_KEY:test
+    curl "localhost:8787/__scheduled?cron=17+3+*+*+*"   # lance la purge

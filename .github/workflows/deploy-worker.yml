@@ -1,0 +1,50 @@
+# Déploie le Worker « outils-api » : migrations D1 d'abord, puis le code.
+# Secrets à créer dans GitHub (Settings > Secrets and variables > Actions) :
+#   CLOUDFLARE_API_TOKEN   jeton avec les droits « Workers Scripts : Edit » et « D1 : Edit »
+#   CLOUDFLARE_ACCOUNT_ID  identifiant du compte Cloudflare
+# Aucun secret n'est écrit dans ce fichier.
+name: Déployer le Worker
+
+on:
+  push:
+    branches: [main]
+    paths: ["worker/**", ".github/workflows/deploy-worker.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: worker
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Vérifier la configuration
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Secret CLOUDFLARE_API_TOKEN manquant dans GitHub."; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Secret CLOUDFLARE_ACCOUNT_ID manquant dans GitHub."; exit 1; }
+          if grep -q "A_COMPLETER" wrangler.jsonc; then
+            echo "::error::worker/wrangler.jsonc contient encore A_COMPLETER : renseignez database_id (D1) et vérifiez bucket_name (R2)."; exit 1
+          fi
+
+      - name: Migrations D1 (avant le déploiement)
+        run: npx --yes wrangler@4 d1 migrations apply projet-db --remote
+
+      - name: Déployer le Worker
+        run: npx --yes wrangler@4 deploy

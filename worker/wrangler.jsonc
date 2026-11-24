@@ -1,0 +1,32 @@
+// Worker « outils-api » : fiches des outils dans R2 (DATA), commentaires dans D1 (DB).
+// Aucun secret ici : EDIT_KEY se crée dans Cloudflare, les clés de déploiement dans GitHub (voir README.md).
+{
+  "name": "outils-api",
+  "main": "index.js",
+  "compatibility_date": "2025-09-01",
+
+  // Fiches modifiées des outils.
+  "r2_buckets": [
+    { "binding": "DATA", "bucket_name": "outils-data" } // À VÉRIFIER : nom exact de votre bucket R2
+  ],
+
+  // Commentaires.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "projet-db",
+      "database_id": "A_COMPLETER_ID_DE_LA_BASE_D1", // Identifiant de la base (pas un secret) : Cloudflare > D1 > projet-db
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Purge quotidienne des vieux commentaires, à 03:17 UTC.
+  "triggers": { "crons": ["17 3 * * *"] },
+
+  "vars": {
+    // Sites autorisés à écrire, séparés par des virgules. « * » remplace un nom de sous-domaine.
+    "ALLOWED_ORIGINS": "https://claude-prime-51g.pages.dev,https://*.claude-prime-51g.pages.dev,https://ptgguedes.github.io",
+    // Durée de conservation des commentaires, en mois.
+    "RETENTION_MONTHS": "12"
+  }
+}
